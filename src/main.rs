@@ -1,4 +1,4 @@
-#![feature(iterator_step_by)] 
+#![feature(iterator_step_by)]
 
 extern crate easy_hash;
 
@@ -6,13 +6,13 @@ use easy_hash::{Sha256, Hasher, HashResult};
 use std::thread;
 use std::sync::mpsc;
 
-const BASE: usize = 64;
+const BASE: usize = 42;
 const THREADS: usize = 4;
 static DIFFICULTY: &'static str = "000000";
 
 struct Solution(usize, String);
 
-fn search(start_at: usize, sender: mpsc::Sender<Solution>) {
+fn search_for_solution(start_at: usize, sender: mpsc::Sender<Solution>) {
     for i in (start_at..).step_by(THREADS) {
         let hash: String = Sha256::hash(format!("{}", i * BASE).as_bytes()).hex();
 
@@ -25,6 +25,7 @@ fn search(start_at: usize, sender: mpsc::Sender<Solution>) {
 
 fn main() {
     println!("Attempting to find a number, which - while multiplied by {} and hashed using SHA-256 - will result in a hash ending with {}.", BASE, DIFFICULTY);
+    println!("Please wait...");
 
     /*
      * Here, we have 4 threads (as specified by the value of THREADS constant).
@@ -40,7 +41,7 @@ fn main() {
     for i in 1..THREADS+1 {
         let sender_n = sender.clone();
         thread::spawn(move || {
-            search(i, sender_n);
+            search_for_solution(i, sender_n);
         });
     }
 
