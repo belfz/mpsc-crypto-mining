@@ -1,7 +1,7 @@
 # mpsc-crypto-mining
 
 An example of using `std::sync::mpsc` with multiple threads of execution.
-The computation-heavy algorithm used in this example is a basic implementation of an idea behind cryptocurrencies mining process (so-called "Proof of Work", or solving the cryptographic problem).
+The computation-heavy algorithm used in this example is a **basic implementation of an idea** behind cryptocurrencies mining process (so-called "Proof of Work", or solving the cryptographic problem).
 
 ### About the cryptographic algorithm
 An example: given a number 42 (the "constant base"), find a number _x_ to multiply it by, so that the result of this multiplication hashed by SHA-256 will produce a hash string ending with `000000`.
