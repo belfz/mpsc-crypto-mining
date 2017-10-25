@@ -18,10 +18,9 @@ To compile with nightly:
 1. `cd` to project's root,
 2. run `rustup override set nightly`
 
-**For maximum performance, instead of running with `cargo run` I recommend to build the project with `--relase` flag:**
+**For maximum performance, instead of running with bare `cargo run` I recommend to add the `--relase` flag:**
 1. `cd` to project's root,
-2. run `cargo build --release`,
-3. run `./target/release/mpsc-crypto-mining` and enjoy!
+2. run `cargo run --release` and enjoy!
 
 Feel free to experiment - change the value of `DIFFICULTY` constant in `src/main.rs` and/or `THREADS`! Please note that a change by one extra desired character in `DIFFICULTY` (eg. one more `0`) can increase the overall difficulty of the problem dramatically, thus noticeably extending the time needed to find the solution!
 
