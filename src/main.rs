@@ -4,7 +4,8 @@ extern crate easy_hash;
 
 use easy_hash::{Sha256, Hasher, HashResult};
 use std::thread;
-use std::sync::mpsc;
+use std::sync::{mpsc, Arc};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 const BASE: usize = 42;
 const THREADS: usize = 4;
@@ -12,18 +13,29 @@ static DIFFICULTY: &'static str = "000000";
 
 struct Solution(usize, String);
 
-fn search_for_solution(start_at: usize, sender: mpsc::Sender<Option<Solution>>) {
-    for i in (start_at..).step_by(THREADS) {
-        let hash: String = Sha256::hash((i * BASE).to_string().as_bytes()).hex();
-        let result = if hash.ends_with(DIFFICULTY) { Some(Solution(i, hash)) } else { None };
+fn verify_number(number: usize) -> Option<Solution> {
+    let hash: String = Sha256::hash((number * BASE).to_string().as_bytes()).hex();
+    if hash.ends_with(DIFFICULTY) {
+        Some(Solution(number, hash))
+    } else {
+        None
+    }
+}
 
-        match sender.send(result) {
-            Ok(_)  => {},
-            Err(_) => {
-                println!("Receiver has stopped listening, dropping worker number {}", start_at);
-                break;
-            },
+fn search_for_solution(start_at: usize, sender: mpsc::Sender<Solution>, is_solution_found: Arc<AtomicBool>) {
+    let mut iteration_no = 0;
+    for number in (start_at..).step_by(THREADS) {
+        if let Some(solution) = verify_number(number) {
+            is_solution_found.store(true, Ordering::Relaxed);
+            match sender.send(solution) {
+                Ok(_)  => {},
+                Err(_) => println!("Receiver has stopped listening, dropping worker number {}.", start_at),
+            }
+            break;
+        } else if iteration_no % 1000 == 0 && is_solution_found.load(Ordering::Relaxed) {
+            break;
         }
+        iteration_no += 1;
     }
 }
 
@@ -31,6 +43,9 @@ fn main() {
     println!("Attempting to find a number, which - while multiplied by {} and hashed using SHA-256 - will result in a hash ending with {}.", BASE, DIFFICULTY);
     println!("Please wait...");
 
+    let is_solution_found = Arc::new(AtomicBool::new(false));
+    let (sender, receiver) = mpsc::channel();
+    
     /*
      * Here, we have 4 threads (as specified by the value of THREADS constant).
      * Thread 1 will start at number 1 and check 5, 9,  13 and so on.
@@ -41,11 +56,11 @@ fn main() {
      * This way, we have 4 parallel threads of execution and we're sure
      * that each number will be examined exactly once.
      */
-    let (sender, receiver) = mpsc::channel();
     for i in 1..THREADS+1 {
         let sender_n = sender.clone();
+        let is_solution_found = is_solution_found.clone();
         thread::spawn(move || {
-            search_for_solution(i, sender_n);
+            search_for_solution(i, sender_n, is_solution_found);
         });
     }
 
@@ -64,8 +79,7 @@ fn main() {
      */
     loop {
         match receiver.recv() {
-            Ok(None) => continue,
-            Ok(Some(Solution(i, hash))) => {
+            Ok(Solution(i, hash)) => {
                 println!("Found the solution.");
                 println!("The number is: {}.", i);
                 println!("Result hash: {}.", hash);
