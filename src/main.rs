@@ -15,12 +15,7 @@ struct Solution(usize, String);
 fn search_for_solution(start_at: usize, sender: mpsc::Sender<Option<Solution>>) {
     for i in (start_at..).step_by(THREADS) {
         let hash: String = Sha256::hash((i * BASE).to_string().as_bytes()).hex();
-
-        let result = if hash.ends_with(DIFFICULTY) {
-            Some(Solution(i, hash))
-        } else {
-            None
-        };
+        let result = if hash.ends_with(DIFFICULTY) { Some(Solution(i, hash)) } else { None };
 
         match sender.send(result) {
             Ok(_)  => {},
