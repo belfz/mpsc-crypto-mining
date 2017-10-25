@@ -25,7 +25,7 @@ fn search_for_solution(start_at: usize, sender: mpsc::Sender<Option<Solution>>) 
         match sender.send(result) {
             Ok(_)  => {},
             Err(_) => {
-                println!("Receiver has stopped receiving, dropping worker number {}", start_at);
+                println!("Receiver has stopped listening, dropping worker number {}", start_at);
                 break;
             },
         }
