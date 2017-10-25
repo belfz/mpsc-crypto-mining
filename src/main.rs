@@ -13,14 +13,21 @@ static DIFFICULTY: &'static str = "000000";
 
 struct Solution(usize, String);
 
+fn verify_number(number: usize) -> Option<Solution> {
+    let hash: String = Sha256::hash((number * BASE).to_string().as_bytes()).hex();
+    if hash.ends_with(DIFFICULTY) {
+        Some(Solution(number, hash))
+    } else {
+        None
+    }
+}
+
 fn search_for_solution(start_at: usize, sender: mpsc::Sender<Solution>, is_solution_found: Arc<AtomicBool>) {
     let mut iteration_no = 0;
-    for i in (start_at..).step_by(THREADS) {
-        let hash: String = Sha256::hash((i * BASE).to_string().as_bytes()).hex();
-        
-        if hash.ends_with(DIFFICULTY) {
+    for number in (start_at..).step_by(THREADS) {
+        if let Some(solution) = verify_number(number) {
             is_solution_found.store(true, Ordering::Relaxed);
-            match sender.send(Solution(i, hash)) {
+            match sender.send(solution) {
                 Ok(_)  => {},
                 Err(_) => println!("Receiver has stopped listening, dropping worker number {}.", start_at),
             }
