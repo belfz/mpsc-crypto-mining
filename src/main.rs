@@ -32,9 +32,7 @@ fn search_for_solution(start_at: usize, sender: mpsc::Sender<Solution>, is_solut
                 Err(_) => println!("Receiver has stopped listening, dropping worker number {}.", start_at),
             }
             break;
-        }
-         
-        if iteration_no % 1000 == 0 && is_solution_found.load(Ordering::Relaxed) {
+        } else if iteration_no % 1000 == 0 && is_solution_found.load(Ordering::Relaxed) {
             break;
         }
         iteration_no += 1;
