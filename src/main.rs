@@ -63,29 +63,13 @@ fn main() {
             search_for_solution(i, sender_n, is_solution_found);
         });
     }
-
-    /*
-     * In a loop, receive messages from the producers.
-     * As long as there is no solution found (None is received),
-     * spin the loop. When the message with a solution arrives
-     * (Some(Solution(i, hash))), print out the result and break
-     * out from the loop.
-     * 
-     * Note that breaking out from the loop drops the receiver,
-     * so that producers will receive an Err(_) on a next attempt to
-     * send a message. This way, producers will "know" that the solution
-     * was found by one of the worker threads and the receiver does no
-     * longer "listen", so they can stop their work too.
-     */
-    loop {
-        match receiver.recv() {
-            Ok(Solution(i, hash)) => {
-                println!("Found the solution.");
-                println!("The number is: {}.", i);
-                println!("Result hash: {}.", hash);
-                break;
-            },
-            Err(_) => panic!("Worker threads disconnected before the solution was found!"),
-        }
+    
+    match receiver.recv() {
+        Ok(Solution(i, hash)) => {
+            println!("Found the solution.");
+            println!("The number is: {}.", i);
+            println!("Result hash: {}.", hash);
+        },
+        Err(_) => panic!("Worker threads disconnected before the solution was found!"),
     }
 }
