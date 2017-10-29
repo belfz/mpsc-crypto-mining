@@ -48,15 +48,17 @@ fn main() {
     
     /*
      * Here, we have 4 threads (as specified by the value of THREADS constant).
-     * Thread 1 will start at number 1 and check 5, 9,  13 and so on.
-     * Thread 2 will start at number 2 and check 6, 10, 14 and so on.
-     * Thread 3 will start at number 3 and check 7, 11, 15 and so on.
-     * Thread 4 will start at number 4 and check 8, 12, 16 and so on.
+     * Thread 0 will start at number 0 and check 0, 4, 8,  12 and so on.
+     * Thread 1 will start at number 1 and check 1, 5, 9,  13 and so on.
+     * Thread 2 will start at number 2 and check 2, 6, 10, 14 and so on.
+     * Thread 3 will start at number 3 and check 3, 7, 11, 15 and so on.
+     * 
+     * See the pattern? ;)
      * 
      * This way, we have 4 parallel threads of execution and we're sure
      * that each number will be examined exactly once.
      */
-    for i in 1..THREADS+1 {
+    for i in 0..THREADS {
         let sender_n = sender.clone();
         let is_solution_found = is_solution_found.clone();
         thread::spawn(move || {
