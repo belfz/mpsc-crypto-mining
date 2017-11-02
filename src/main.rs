@@ -40,8 +40,7 @@ fn search_for_solution(start_at: usize, sender: mpsc::Sender<Solution>, is_solut
 }
 
 fn main() {
-    println!("Attempting to find a number, which - while multiplied by {} and hashed using SHA-256 - will result in a hash ending with {}.", BASE, DIFFICULTY);
-    println!("Please wait...");
+    println!("Attempting to find a number, which - while multiplied by {} and hashed using SHA-256 - will result in a hash ending with {}. \nPlease wait...", BASE, DIFFICULTY);
 
     let is_solution_found = Arc::new(AtomicBool::new(false));
     let (sender, receiver) = mpsc::channel();
