@@ -6,12 +6,19 @@ use easy_hash::{Sha256, Hasher, HashResult};
 use std::thread;
 use std::sync::{mpsc, Arc};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Instant;
 
 const BASE: usize = 42;
 const THREADS: usize = 4;
-static DIFFICULTY: &'static str = "000000";
+static DIFFICULTY: &'static str = "0000000";
 
 struct Solution(usize, String);
+
+// A helper function used to measure execution time in seconds.
+fn measure_exec_time_seconds(start_time: Instant) -> f64 {
+    let elapsed = start_time.elapsed();
+    (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
+}
 
 fn verify_number(number: usize) -> Option<Solution> {
     let hash: String = Sha256::hash((number * BASE).to_string().as_bytes()).hex();
@@ -42,6 +49,8 @@ fn search_for_solution(start_at: usize, sender: mpsc::Sender<Solution>, is_solut
 fn main() {
     println!("Attempting to find a number, which - while multiplied by {} and hashed using SHA-256 - will result in a hash ending with {}. \nPlease wait...", BASE, DIFFICULTY);
 
+    // Start the timer to measure execution time.
+    let start = Instant::now();
     let is_solution_found = Arc::new(AtomicBool::new(false));
     let (sender, receiver) = mpsc::channel();
     
@@ -70,6 +79,7 @@ fn main() {
             println!("Found the solution.");
             println!("The number is: {}.", i);
             println!("Result hash: {}.", hash);
+            println!("(using {} thread(s), it finished in {}s)", THREADS, measure_exec_time_seconds(start));
         },
         Err(_) => panic!("Worker threads disconnected before the solution was found!"),
     }
