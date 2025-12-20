@@ -1,5 +1,3 @@
-#![feature(iterator_step_by)]
-
 extern crate easy_hash;
 
 use easy_hash::{Sha256, Hasher, HashResult};
