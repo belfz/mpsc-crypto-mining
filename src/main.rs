@@ -1,5 +1,3 @@
-extern crate easy_hash;
-
 use easy_hash::{Sha256, Hasher, HashResult};
 use std::thread;
 use std::sync::{mpsc, Arc};
