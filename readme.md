@@ -12,11 +12,6 @@ The actual solution is 3,305,951, which - while multiplied by 42 gives 138,849,9
 This example uses `std::sync::mpsc` as a channel of communication between four worker threads and the main thread. Each worker thread analyses unique numbers (by starting the iterations at different "points" and having constant step). For more info, see the large comment inside `src/main.rs`'s `main()` function.
 
 ### How-to
-This example uses unstable feature - the [step_by method](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.step_by) from `std::iter::Iterator`'s implementation for `std::ops::Range`. This is why `#![feature(iterator_step_by)]` attribute is present at the top of `src/main.rs`. **For that reason, this project will currently compile with nightly only!**
-
-To compile with nightly: 
-1. `cd` to project's root,
-2. run `rustup override set nightly`
 
 **For maximum performance, instead of running with bare `cargo run` I recommend to add the `--relase` flag:**
 1. `cd` to project's root,
